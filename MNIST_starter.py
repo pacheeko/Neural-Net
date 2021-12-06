@@ -36,8 +36,6 @@ def getStdDev(arr, mean):
         stdDev += pow((x - mean), 2)
     return math.sqrt((stdDev / mean), 2)
     
-    
-
 ##################################################
 # NOTE: make sure these paths are correct for your directory structure
 
@@ -69,24 +67,33 @@ def getImgData(imagefile):
     images = idx2numpy.convert_from_file(imagefile) 
     
     # We want to flatten each image from a 28 x 28 to a 784 x 1 numpy array
-    arr = np.array(images).reshape(784,1)
+    arr_len = len(images)
+    print(arr_len)
+    for x in images:
+        x = np.array(x).reshape(1, 784)
     
     # convert to floats in [0,1] (only really necessary if you have other features, but we'll do it anyways)
-    mean = getMean(arr)
-    stdDev = getStdDev(arr, mean)
-    for x in arr:
-        arr[x, 1] = standardize(x, mean, stdDev)
-    return arr
-
+    for arr in images:
+        mean = getMean(arr)
+        stdDev = getStdDev(arr, mean)
+        for x in arr:
+            arr[x, 1] = standardize(x, mean, stdDev)
+    return images
 
 # reads the data from the four MNIST files,
 # divides the data into training and testing sets, and encodes the training vectors in onehot form
 # returns a tuple (trainingData, testingData), each of which is a zipped array of features and labels
 def prepData():
     ntrain, train_labels = getLabels(trainingLabelFile)
-
-    # CODE GOES HERE
-       
+    ntest, test_labels = getLabels(testingLabelFile)
+    train_images = getImgData(trainingImageFile)
+    test_images = getImgData(testingImageFile)
+    
+    
+    
+    
+    
+    
     return (trainingData, testingData)
     
 
@@ -94,7 +101,6 @@ def prepData():
 
 
 trainingData, testingData = prepData()
-
 net = network.Network([784,10,10])
 net.SGD(trainingData, 10, 10, .1, test_data = testingData)
 
