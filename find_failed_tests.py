@@ -1,38 +1,19 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Dec  7 13:40:24 2021
+
+@author: bpach
+"""
+
 import numpy as np
 import idx2numpy
 import network
 import pickle
 
-# converts a 1d python list into a (1,n) row vector
-def rv(vec):
-    return np.array([vec])
-    
-# converts a 1d python list into a (n,1) column vector
-def cv(vec):
-    return rv(vec).T
-        
-# creates a (size,1) array of zeros, whose ith entry is equal to 1    
-def onehot(i, size):
-    vec = np.zeros(size)
-    vec[i] = 1
-    return cv(vec)
-
-# **Code taken from lecture**
-# Standardizes the array to values between 0 and 1
-def standardize(x, mu, sigma):
-    return (x - mu) / sigma
-    
-##################################################
-# NOTE: make sure these paths are correct for your directory structure
-
-# training data
-trainingImageFile = "data/train-images.idx3-ubyte"
-trainingLabelFile = "data/train-labels.idx1-ubyte"
-
+#####################################################################################################
 # testing data
 testingImageFile = "data/t10k-images.idx3-ubyte"
 testingLabelFile = "data/t10k-labels.idx1-ubyte"
-
 
 # returns the number of entries in the file, as well as a list of integers
 # representing the correct label for each entry
@@ -79,47 +60,37 @@ def getImgData(imagefile):
         it += 1
     return normal_images
 
-# reads the data from the four MNIST files,
-# divides the data into training and testing sets, and encodes the training vectors in onehot form
-# returns a tuple (trainingData, testingData), each of which is a zipped array of features and labels
-def prepData():
-    ntrain, train_labels = getLabels(trainingLabelFile)
-    train_labels_oh = np.empty((ntrain, 10,1))
-    it = 0
-    while it < ntrain:
-        train_labels_oh[it] = onehot(train_labels[it],10)
-        it += 1
-    
+def prepTestData():
     ntest, test_labels = getLabels(testingLabelFile)
-    train_images = getImgData(trainingImageFile)
+
     test_images = getImgData(testingImageFile)
     
-    it = 0;
-    trainingData = []
-    while it < ntrain:
-        trainingData.append((train_images[it], train_labels_oh[it]))
-        it += 1
-        
     it = 0
     testingData = []
     while it < ntest:
         testingData.append((test_images[it], test_labels[it]))
         it += 1
     
-    return (trainingData, testingData)
+    return ntest, testingData
+
+#################################################################################################################
+
+filename = 'part1.pkl'
+
+with open(filename, 'rb') as f:
+    net = pickle.load(f)
     
+ntest, test_data = prepTestData()
 
-###################################################
+test_results = [(np.argmax(net.feedforward(x)), y) for (x, y) in test_data]
 
+length = len(test_results)
+it = 0
+num = 0
+for (x,y) in test_results:
+    if (x != y):
+        print("Index: " + str(it) + " Guess: " + str(x) + " Actual: " + str(y))
+        num += 1
+    it += 1
 
-trainingData, testingData = prepData()
-net = network.Network([784,20,10])
-net.SGD(trainingData, 20, 20, 5, test_data = testingData)
-#pickle.dump(net, open('part1.pkl', 'wb'))
-
-
-
-
-
-
-        
+print("total failed: " + str(num))
