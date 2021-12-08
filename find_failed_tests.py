@@ -15,6 +15,7 @@ import pickle
 testingImageFile = "data/t10k-images.idx3-ubyte"
 testingLabelFile = "data/t10k-labels.idx1-ubyte"
 
+
 # returns the number of entries in the file, as well as a list of integers
 # representing the correct label for each entry
 def getLabels(labelfile):

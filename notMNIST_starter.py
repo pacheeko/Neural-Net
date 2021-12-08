@@ -1,6 +1,6 @@
 import numpy as np
 import network
-
+import pickle
 
 # converts a 1d python list into a (1,n) row vector
 def rv(vec):
@@ -16,6 +16,11 @@ def onehot(i, size):
     vec[i] = 1
     return cv(vec)
 
+# **Code taken from lecture**
+# Standardizes the array to values between 0 and 1
+def standardize(x, mu, sigma):
+    return (x - mu) / sigma
+    
     
 #################################################################
 
@@ -31,19 +36,75 @@ def prepData():
         test_features, test_labels = f['x_test'], f['y_test']
         
     # need to rescale, flatten, convert training labels to one-hot, and zip appropriate components together
-    # CODE GOES HERE
     
-       
+    #flatten training and testing features
+    ntrain = len(train_labels)
+    ntest = len(test_labels)
+    
+    np_train_features = np.array(train_features)
+    np_test_features = np.array(test_features)
+    flat_train_features = np.empty((ntrain, 784, 1)) 
+    flat_test_features = np.empty((ntest, 784, 1))
+    it = 0
+    while it < ntrain:
+        flat_train_features[it] = np_train_features[it].reshape((784,1))
+        it += 1
+        
+    it = 0
+    while it < ntest:
+        flat_test_features[it] = np_test_features[it].reshape((784,1))
+        it += 1
+        
+    
+    #Normalize data in feature vectors   
+    normal_train_features = np.empty((ntrain, 784, 1))
+    normal_test_features = np.empty((ntest, 784, 1))
+    
+    it = 0
+    while it < ntrain:
+        arr = flat_train_features[it]
+        norm = np.linalg.norm(arr)
+        arr = np.divide(arr, norm)
+        normal_train_features[it] = arr
+        it += 1
+
+    it = 0
+    while it < ntest:
+        arr = flat_test_features[it]   
+        norm = np.linalg.norm(arr)
+        arr = np.divide(arr, norm)
+        normal_test_features[it] = arr
+        it += 1
+    
+    #Convert training labels to one hot
+    train_labels_oh = np.empty((ntrain, 10, 1))
+    it = 0
+    while it < ntrain:
+        train_labels_oh[it] = onehot(train_labels[it] ,10)
+        it += 1
+    
+    trainingData = []
+    testingData = []
+    
+    it = 0
+    while it < ntrain:
+        trainingData.append((normal_train_features[it], train_labels_oh[it]))
+        it += 1
+        
+    it = 0
+    while it < ntest:
+        testingData.append((normal_test_features[it], test_labels[it]))
+        it += 1
+        
     return (trainingData, testingData)
     
 ###################################################################
 
-
 trainingData, testingData = prepData()
 
-net = network.Network([784,10])
-net.SGD(trainingData, 10, 10, 10, test_data = testingData)
-
+net = network.Network([784,20,10])
+net.SGD(trainingData, 30, 20, 20, test_data = testingData)
+pickle.dump(net, open('part2.pkl', 'wb'))
 
 
 
