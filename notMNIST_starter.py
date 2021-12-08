@@ -21,7 +21,7 @@ def onehot(i, size):
 def standardize(x, mu, sigma):
     return (x - mu) / sigma
     
-    
+MAX_SIZE = 255
 #################################################################
 
 # reads the data from the notMNIST.npz file,
@@ -95,7 +95,7 @@ def prepData():
     while it < ntest:
         testingData.append((normal_test_features[it], test_labels[it]))
         it += 1
-        
+    
     return (trainingData, testingData)
     
 ###################################################################

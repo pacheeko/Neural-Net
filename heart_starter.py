@@ -27,8 +27,20 @@ def standardize(x, mu, sigma):
 # reads number of data points, feature vectors and their labels from the given file
 # and returns them as a tuple
 def readData(filename):
-
-    # CODE GOES HERE
+    #** code taken from https://realpython.com/python-csv/ **
+    features = []
+    labels = []
+    with open(filename) as file:
+        csv_reader = csv.reader(file, delimiter=',')
+        n = 0
+        for row in csv_reader:
+            if n == 0:
+                print(f'Column names are {", ".join(row)}')
+                n += 1
+            else:
+                features.append([row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9]])
+                labels.append(row[10])
+                n += 1
     
     return n, features, labels
 
@@ -41,19 +53,66 @@ def readData(filename):
 def prepData():
 
     n, features, labels = readData('data/heart.csv')
-
-    # CODE GOES HERE
-
+    
+    n = n-1
+    for f in features:
+        if (f[4] == "Present"):
+            f[4] = 1
+        else:
+            f[4] = 0
+    
+    arr = np.empty((n, 9, 1))
+    it = 0
+    while it < n:
+        arr[it] = cv(features[it])
+        it += 1
+        
+    means = np.ndarray.mean(arr, axis=0).flatten().round(2)
+    stds = np.ndarray.std(arr, axis = 0).flatten().round(2)
+    maxAge = np.ndarray.max(arr, axis = 0)[8][0]
+    #standardize all features except family history and age. For age, divide by the max age
+    for f in arr:
+        f[0] = standardize(float(f[0]), float(means[0]), float(stds[0])) #sbp
+        f[1] = standardize(float(f[1]), float(means[1]), float(stds[1])) #tobacco
+        f[2] = standardize(float(f[2]), float(means[2]), float(stds[2])) #ldl
+        f[3] = standardize(float(f[3]), float(means[3]), float(stds[3])) #adiposity                                             
+        f[5] = standardize(float(f[5]), float(means[5]), float(stds[5])) #typea
+        f[6] = standardize(float(f[6]), float(means[6]), float(stds[6])) #obesity
+        f[7] = standardize(float(f[7]), float(means[7]), float(stds[7])) #alcohol
+        f[8] = float(f[8][0])/float(maxAge) #age
+    
+    #Take 1/6 of the data points as test data, the rest as training data    
+    ntest = n/6
+    ntrain = n - ntest
+    
+    #trainingData = []
+    #testingData = []
+    #Add the first ntrain features and labels to the training vector.
+    #Convert labels to onehot
+    #it = 0;
+    #while it < ntrain:
+    #    label_oh = onehot(int(labels[it]),2)
+    #    trainingData.append([arr[it],label_oh])
+    #    it += 1
+    #Add the rest of the features and labels to the test vector
+    #while it < n:
+    #    testingData.append([arr[it], labels[it]])
+    #    it += 1
+    
+    trainingLabels = [onehot(label,2) for label in labels[:ntrain]]
+    trainingData = zip(arr[:ntrain], trainingLabels)
+    
+    
+    
     return (trainingData, testingData)
 
 
 ###################################################
-
-
 trainingData, testingData = prepData()
-
 net = network.Network([9,10,2])
 net.SGD(trainingData, 10, 10, .1, test_data = testingData)
+
+
 
 
        
