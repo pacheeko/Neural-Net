@@ -1,7 +1,7 @@
 import csv
 import numpy as np
 import network
-
+import datetime
 
 # converts a 1d python list into a (1,n) row vector
 def rv(vec):
@@ -85,22 +85,22 @@ def prepData():
     ntest = n/6
     ntrain = n - ntest
     
-    #trainingData = []
-    #testingData = []
+    trainingData = []
+    testingData = []
     #Add the first ntrain features and labels to the training vector.
     #Convert labels to onehot
-    #it = 0;
-    #while it < ntrain:
-    #    label_oh = onehot(int(labels[it]),2)
-    #    trainingData.append([arr[it],label_oh])
-    #    it += 1
+    it = 0;
+    while it < ntrain:
+        label_oh = onehot(int(labels[it]),2)
+        trainingData.append((arr[it],label_oh))
+        it += 1
     #Add the rest of the features and labels to the test vector
-    #while it < n:
-    #    testingData.append([arr[it], labels[it]])
-    #    it += 1
+    while it < n:
+        testingData.append((arr[it], int(labels[it])))
+        it += 1
     
-    trainingLabels = [onehot(label,2) for label in labels[:ntrain]]
-    trainingData = zip(arr[:ntrain], trainingLabels)
+    #trainingLabels = [onehot(label,2) for label in labels[:ntrain]]
+    #trainingData = zip(arr[:ntrain], trainingLabels)
     
     
     
@@ -110,9 +110,11 @@ def prepData():
 ###################################################
 trainingData, testingData = prepData()
 net = network.Network([9,10,2])
+start = datetime.datetime.now()
 net.SGD(trainingData, 10, 10, .1, test_data = testingData)
-
-
+end = datetime.datetime.now()
+diff = end - start
+print("Training time: " + str(diff.seconds) + " seconds, " + str(diff.microseconds) + " microseconds")
 
 
        
