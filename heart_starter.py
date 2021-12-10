@@ -99,19 +99,14 @@ def prepData():
         testingData.append((arr[it], int(labels[it])))
         it += 1
     
-    #trainingLabels = [onehot(label,2) for label in labels[:ntrain]]
-    #trainingData = zip(arr[:ntrain], trainingLabels)
-    
-    
-    
     return (trainingData, testingData)
 
 
 ###################################################
 trainingData, testingData = prepData()
-net = network.Network([9,10,2])
+net = network.Network([9,20,2])
 start = datetime.datetime.now()
-net.SGD(trainingData, 10, 10, .1, test_data = testingData)
+net.SGD(trainingData, 100, 30, 0.3, test_data = testingData)
 end = datetime.datetime.now()
 diff = end - start
 print("Training time: " + str(diff.seconds) + " seconds, " + str(diff.microseconds) + " microseconds")
