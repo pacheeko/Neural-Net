@@ -2,6 +2,7 @@ import csv
 import numpy as np
 import network
 import datetime
+import pickle
 
 # converts a 1d python list into a (1,n) row vector
 def rv(vec):
@@ -106,9 +107,10 @@ def prepData():
 trainingData, testingData = prepData()
 net = network.Network([9,20,2])
 start = datetime.datetime.now()
-net.SGD(trainingData, 100, 30, 0.3, test_data = testingData)
+net.SGD(trainingData, 100, 30, 0.9, test_data = testingData)
 end = datetime.datetime.now()
 diff = end - start
+pickle.dump(net, open('part3.pkl', 'wb'))
 print("Training time: " + str(diff.seconds) + " seconds, " + str(diff.microseconds) + " microseconds")
 
 

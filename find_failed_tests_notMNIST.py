@@ -42,7 +42,7 @@ def prepTestData():
     it = 0
     testingData = []
     while it < ntest:
-        testingData.append((test_features[it], test_labels[it]))
+        testingData.append((normal_test_features[it], test_labels[it]))
         it += 1
     
     return ntest, testingData

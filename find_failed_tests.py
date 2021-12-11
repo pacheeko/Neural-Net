@@ -52,12 +52,6 @@ def getImgData(imagefile):
         norm = np.linalg.norm(arr)
         arr = np.divide(arr, norm)
         normal_images[it] = arr
-        #it2 = 0
-        #while it2 < 784:
-         #   print(flat_images[it][it2])
-          #  flat_images[it][it2] = standardize(flat_images[it][it2], mean, stdDev)
-           # print(flat_images[it][it2])
-            #it2 += 1
         it += 1
     return normal_images
 
